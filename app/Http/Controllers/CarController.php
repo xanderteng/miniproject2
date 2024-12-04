@@ -11,7 +11,7 @@ class CarController extends Controller
 {
     public function index()
     {
-        $cars = Car::with('location')->orderBy('parked_at', 'asc')->paginate(20);
+        $cars = Car::with('location')->orderBy('parked_at', 'asc')->paginate(10);
         $carCount = $cars->total();
 
         return view('cars.index', compact('cars', 'carCount'));
@@ -29,11 +29,11 @@ class CarController extends Controller
             'license_plate' => [
                 'required',
                 'unique:cars',
-                'regex:/^[A-Z]{1,2} [0-9]{1,4} [A-Z]{2}$/'
+                'regex:/^[A-Z]{1,2} [0-9]{4} [A-Z]{2}$/'
             ],
             'car_type' => 'required',
             'location_id' => 'required|exists:locations,id',
-            'car_type_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validation for image
+            'car_type_image' => 'required|image|mimes:jpeg,png,jpg,svg|max:2048', 
         ], [
             'license_plate.required' => 'This field is required!',
             'license_plate.unique' => 'This license plate already exists!',
@@ -43,7 +43,7 @@ class CarController extends Controller
             'location_id.exists' => 'Invalid location selected!',
             'car_type_image.required' => 'The car type image is required!',
             'car_type_image.image' => 'The file must be an image.',
-            'car_type_image.mimes' => 'Only jpeg, png, jpg, gif, and svg images are allowed.',
+            'car_type_image.mimes' => 'Only jpeg, png, jpg, and svg images are allowed.',
             'car_type_image.max' => 'Image size must not exceed 2MB.',
         ]);
 
@@ -72,11 +72,11 @@ class CarController extends Controller
             'license_plate' => [
                 'required',
                 'unique:cars,license_plate,' . $car->id,
-                'regex:/^[A-Z]{1,2} [0-9]{1,4} [A-Z]{2}$/'
+                'regex:/^[A-Z]{1,2} [0-9]{4} [A-Z]{2}$/'
             ],
             'car_type' => 'required',
             'location_id' => 'required|exists:locations,id',
-            'car_type_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validation for image (nullable since not always required)
+            'car_type_image' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048', 
         ], [
             'license_plate.required' => 'This field is required!',
             'license_plate.unique' => 'This license plate already exists!',
@@ -85,7 +85,7 @@ class CarController extends Controller
             'location_id.required' => 'This field is required!',
             'location_id.exists' => 'Invalid location selected!',
             'car_type_image.image' => 'The file must be an image.',
-            'car_type_image.mimes' => 'Only jpeg, png, jpg, gif, and svg images are allowed.',
+            'car_type_image.mimes' => 'Only jpeg, png, jpg, and svg images are allowed.',
             'car_type_image.max' => 'Image size must not exceed 2MB.',
         ]);
 
@@ -104,7 +104,7 @@ class CarController extends Controller
             $data['car_type_image'] = $request->file('car_type_image')->store('car_images', 'public');
         }
 
-        // Update the car record
+       
         $car->update($data);
 
         return redirect('/')->with('success', 'Car updated successfully!');
@@ -112,7 +112,7 @@ class CarController extends Controller
 
     public function destroy(Car $car)
     {
-        
+       
         if ($car->car_type_image) {
         
             Storage::delete('public/' . $car->car_type_image);

@@ -19,6 +19,6 @@ class ParkingLotSeeder extends Seeder
         }
 
         //20 Factory
-        Car::factory(17)->create();
+        Car::factory(20)->create();
     }
 }

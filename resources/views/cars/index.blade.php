@@ -10,7 +10,7 @@
             background-color: #333;
             overflow: hidden;
             display: flex;
-            justify-content: flex-start; /* Align items to the left */
+            justify-content: flex-start;
             padding: 10px;
         }
         .navbar a {
@@ -26,7 +26,6 @@
         .navbar a.active {
             background-color: #4CAF50;
         }
-      
         table {
             width: 100%;
             border-collapse: collapse;
@@ -39,7 +38,6 @@
             padding: 8px;
             text-align: left;
         }
-      
         .delete-btn, .edit-btn {
             font-size: 14px;
             cursor: pointer;
@@ -59,13 +57,21 @@
 </head>
 <body>
 
-<!-- Navbar -->
 <div class="navbar">
     <a href="{{ route('cars.index') }}" class="{{ Request::is('cars') ? 'active' : '' }}">Parking Lot</a>
     <a href="{{ route('cars.create') }}" class="{{ Request::is('cars/create') ? 'active' : '' }}">Add New Car</a>
+
+    @if(auth()->check())
+        <form action="{{ route('logout') }}" method="POST" style="margin-left:auto;">
+            @csrf
+            <button type="submit" style="background:none; border:none; color:white; text-decoration:none; cursor:pointer;">Logout</button>
+        </form>
+    @else
+        <a href="{{ route('getRegister') }}" style="margin-left:auto;" class="{{ Request::is('register') ? 'active' : '' }}">Register</a>
+        <a href="{{ route('getLogin') }}" class="{{ Request::is('login') ? 'active' : '' }}">Login</a>
+    @endif
 </div>
 
-<!-- Main Content -->
 <div style="padding: 20px;">
     <h1>Cars List</h1>
     <p>Total Cars Parked: {{ $carCount }}</p>
@@ -79,7 +85,9 @@
                 <th>Parked At</th>
                 <th>Location</th>
                 <th>Car Image</th>
-                <th colspan="2">Actions</th>
+                @if(auth()->check())
+                    <th colspan="2">Actions</th>
+                @endif
             </tr>
         </thead>
         <tbody>
@@ -91,31 +99,31 @@
                     <td>{{ $car->parked_at }}</td>
                     <td>{{ $car->location->name }}</td>
                     <td>
-                    @if($car->car_type_image)
-                        <img src="{{ asset('storage/' . $car->car_type_image) }}" alt="Car Image" width="100">
-                    @else
-    No image available
-@endif
-
+                        @if($car->car_type_image)
+                            <img src="{{ asset('storage/' . $car->car_type_image) }}" alt="Car Image" width="100">
+                        @else
+                            No image available
+                        @endif
                     </td>
-                    <td>
-                        <a href="{{ route('cars.edit', $car->id) }}" class="edit-btn">Edit</a>
-                    </td>
-                    <td>
+                    @if(auth()->check())
+                        <td>
+                            <a href="{{ route('cars.edit', $car->id) }}" class="edit-btn">Edit</a>
+                        </td>
+                        <td>
                         <form action="{{ route('cars.destroy', $car->id) }}" method="POST" style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" onclick="return confirm('Are you sure you want to delete this car?')" class="delete-btn">Delete</button>
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" onclick="return confirm('Are you sure you want to delete this car?')" class="delete-btn">Delete</button>
                         </form>
-                    </td>
+                        </td>
+                    @endif
                 </tr>
             @endforeach
         </tbody>
     </table>
 
-    <!-- Pagination -->
     <div class="d-flex justify-content-center mt-4">
-        {{ $cars->links() }} 
+        {{ $cars->links() }}
     </div>
 </div>
 
