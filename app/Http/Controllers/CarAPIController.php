@@ -3,27 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\Car;
-use App\Models\Location;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Resources\CarCollection;
 
-class CarController extends Controller
+class CarAPIController extends Controller
 {
-    public function index()
-    {
-        $cars = Car::with('location')->orderBy('parked_at', 'asc')->paginate(10);
-        $carCount = $cars->total();
-
-        return view('cars.index', compact('cars', 'carCount'));
+    function getCars() {
+        $cars = Car::all();
+        return response()->json([
+            'data' => $cars
+        ]);
     }
-
-    public function create()
-    {
-        $locations = Location::all();
-        return view('cars.create', compact('locations'));
-    }
-
+    
     public function store(Request $request)
     {
         $request->validate([
@@ -58,13 +50,7 @@ class CarController extends Controller
 
         Car::create($data);
 
-        return redirect('/')->with('success', 'Car added successfully!');
-    }
-
-    public function edit(Car $car)
-    {
-        $locations = Location::all();
-        return view('cars.edit', compact('car', 'locations'));
+        return response('Car Added Succesfully!');
     }
 
     public function update(Request $request, Car $car)
@@ -108,25 +94,16 @@ class CarController extends Controller
        
         $car->update($data);
 
-        return redirect('/')->with('success', 'Car updated successfully!');
+        return response('Car Updated Succesfully!');
     }
 
     public function destroy(Car $car)
     {
-       
         if ($car->car_type_image) {
         
             Storage::delete('public/' . $car->car_type_image);
         }
-
-       
         $car->delete();
-
-        return redirect('/')->with('success', 'Car deleted successfully!');
-    }
-
-    function carsAPI(){
-        $cars = Car::all;
-    return new CarCollection($cars);
-    }
+        return response('Car deleted successfully!');
+    }    
 }

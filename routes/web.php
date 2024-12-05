@@ -13,6 +13,7 @@ Route::controller(CarController::class)->group(function () {
     Route::get('/edit-cars/{car}', 'edit')->name('cars.edit')->middleware(IsLogin::class); 
     Route::put('/edit-cars/{car}', 'update')->name('cars.update')->middleware(IsLogin::class);
     Route::delete('/delete-cars/{car}', 'destroy')->name('cars.destroy')->middleware(IsLogin::class);
+    Route::get('/api', 'carsAPI')->name('carsAPI');
 });
 
 Route::controller(AuthController::class)->group(function(){
